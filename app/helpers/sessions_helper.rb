@@ -5,6 +5,13 @@ module SessionsHelper
     session[:user_id] = user.id
   end
 
+  # 渡されたユーザーが、現在ログインしているユーザー（自分）であればtrueを返します
+  def current_user?(user)
+    # 1. ユーザーが空(nil)でないことを確認
+    # 2. そのユーザーが現在ログイン中の自分(current_user)と一致するかを比較します
+    user && user == current_user
+  end
+
   # 永続的セッションを記憶します（Userモデルを参照）
   def remember(user)
     user.remember
