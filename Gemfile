@@ -21,6 +21,7 @@ gem "bootsnap", require: false
 gem "sassc-rails"
 gem 'bootstrap-sass', '3.3.6'
 gem 'jquery-rails'
+gem "rails-i18n", "~> 7.0" 
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
