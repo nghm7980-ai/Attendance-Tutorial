@@ -1,8 +1,8 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
-  before_action :logged_in_user, only: [:index, :show, :edit, :update]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :correct_user, only: [:edit, :update]
-  before_action :admin_user, only: :destroy
+  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
 
   def index
     @users = User.paginate(page: params[:page])
@@ -42,6 +42,34 @@ class UsersController < ApplicationController
     @user.destroy
     flash[:success] = "#{@user.name}のデータを削除しました。"
     redirect_to users_url
+  end
+
+  def edit_basic_info
+    @user = User.find(params[:id]) # set_userがあるため省略可能ですが、カリキュラムには記載があります
+  
+    respond_to do |format|
+      format.html { render partial: 'users/edit_basic_info', locals: { user: @user } }
+      format.turbo_stream
+    end
+  end
+
+  def update_basic_info
+    if @user.update(basic_info_params)
+      flash[:success] = "#{@user.name}の基本情報を更新しました。"
+    else
+      # カリキュラムの指定：エラーメッセージを<br>で連結する
+      flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+    end
+    
+    # カリキュラムの指定：format.turbo_stream を含む respond_to を使用
+    respond_to do |format|
+      format.html { redirect_to users_url }
+      format.turbo_stream
+    end
+  end
+
+  def basic_info_params
+    params.require(:user).permit(:department, :basic_time, :work_time)
   end
 
   private
