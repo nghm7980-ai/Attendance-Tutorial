@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_03_002249) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_04_053801) do
+  create_table "attendances", charset: "utf8mb4", force: :cascade do |t|
+    t.date "worked_on"
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.string "note"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_attendances_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb4", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -25,4 +36,5 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_03_002249) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "attendances", "users"
 end
