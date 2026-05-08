@@ -1,0 +1,5 @@
+【コード追加】.rspec の内容を書き換えてください
+
+--require spec_helper
+--color
+--format documentation

@@ -4,7 +4,6 @@ ruby "3.0.6"
 
 gem "rails", "~> 7.1.0"
 gem 'bcrypt'
-gem 'faker'
 gem "sprockets-rails"
 gem "mysql2"
 gem "puma", ">= 5.0"
@@ -25,6 +24,7 @@ gem "rails-i18n", "~> 7.0"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
+  gem 'faker'
 end
 
 group :development do
