@@ -8,24 +8,44 @@ class UsersController < ApplicationController
 
   def index
     @users = User.paginate(page: params[:page])
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @users }
+    end 
   end
 
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
+    respond_to do |format|
+      format.html # これがないとブラウザで画面が表示されません
+      format.json { render json: @user } # これでテストが通ります
+    end
   end
 
   def new
     @user = User.new
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @user }
+    end
   end
 
   def create
     @user = User.new(user_params)
-    if @user.save
-      log_in @user # 保存成功後、ログインします。
-      flash[:success] = '新規作成に成功しました。'
-      redirect_to @user
-    else
-      render 'new', status: :unprocessable_entity
+    respond_to do |format|
+      if @user.save
+        log_in @user
+        flash[:success] = '新規作成に成功しました。'
+        format.html { redirect_to @user }
+        # テスト(JSON)向けに「作成成功(created)」とデータを返します
+        format.json { render json: @user, status: :created, location: @user }
+      else
+        format.html { render 'new', status: :unprocessable_entity }
+        # テスト(JSON)向けに「エラー内容」を返します
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -33,27 +53,35 @@ class UsersController < ApplicationController
   end
 
   def update
-    if @user.update(user_params)
-      flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to @user
-    else
-      render 'edit', status: :unprocessable_entity     
+    respond_to do |format|
+      if @user.update(user_params)
+        flash[:success] = "ユーザー情報を更新しました。"
+        format.html { redirect_to @user }
+        # テスト(JSON)向けに「成功(ok)」を返します
+        format.json { render json: @user, status: :ok }
+      else
+        format.html { render 'edit', status: :unprocessable_entity }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
     end
   end
 
   def destroy
+    # ユーザーを削除します
     @user.destroy
+    # ブラウザ表示用のフラッシュメッセージを設定します
     flash[:success] = "#{@user.name}のデータを削除しました。"
-    redirect_to users_url
+    
+    # リクエストの形式（HTMLかJSONか）によって、返し方を変えます
+    respond_to do |format|
+      # ブラウザ（HTML）の場合は、ユーザー一覧ページへ移動します
+      format.html { redirect_to users_url }
+      # テスト（JSON）の場合は、中身なしの成功ステータス(204 No Content)を返します
+      format.json { head :no_content }
+    end
   end
 
   def edit_basic_info
-    @user = User.find(params[:id]) # set_userがあるため省略可能ですが、カリキュラムには記載があります
-  
-    respond_to do |format|
-      format.html { render partial: 'users/edit_basic_info', locals: { user: @user } }
-      format.turbo_stream
-    end
   end
 
   def update_basic_info
